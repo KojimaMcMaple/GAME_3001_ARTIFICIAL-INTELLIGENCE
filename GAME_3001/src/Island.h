@@ -13,11 +13,11 @@ public:
 
 
 	// Inherited via GameObject
-	void draw() override;
+	void Draw() override;
 
-	void update() override;
+	void Update() override;
 
-	void clean() override;
+	void Clean() override;
 private:
 
 	void _move();

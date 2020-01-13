@@ -14,77 +14,77 @@ GameObject::~GameObject()
 }
 
 
-glm::vec2 GameObject::getPosition()
+glm::vec2 GameObject::GetPosition()
 {
 	return m_position;
 }
 
-glm::vec2 GameObject::getRotation()
+glm::vec2 GameObject::GetRotation()
 {
 	return m_rotation;
 }
 
-glm::vec2 GameObject::getScale()
+glm::vec2 GameObject::GetScale()
 {
 	return m_scale;
 }
 
-glm::vec2 GameObject::getVelocity()
+glm::vec2 GameObject::GetVelocity()
 {
 	return m_velocity;
 }
 
-glm::vec2 GameObject::getAcceleration()
+glm::vec2 GameObject::GetAcceleration()
 {
 	return m_acceleration;
 }
 
-int GameObject::getWidth()
+int GameObject::GetWidth()
 {
 	return m_width;
 }
 
-int GameObject::getHeight()
+int GameObject::GetHeight()
 {
 	return m_height;
 }
 
-bool GameObject::getIsColliding()
+bool GameObject::GetIsColliding()
 {
 	return m_isColliding;
 }
 
-GameObjectType GameObject::getType()
+GameObjectType GameObject::GetType()
 {
 	return m_type;
 }
 
-void GameObject::setPosition(glm::vec2 newPosition)
+void GameObject::SetPosition(glm::vec2 newPosition)
 {
 	m_position = newPosition;
 }
 
-void GameObject::setWidth(int newWidth)
+void GameObject::SetWidth(int newWidth)
 {
 	m_width = newWidth;
 }
 
-void GameObject::setHeight(int newHeight)
+void GameObject::SetHeight(int newHeight)
 {
 	m_height = newHeight;
 }
 
-void GameObject::setVelocity(glm::vec2 newVelocity)
+void GameObject::SetVelocity(glm::vec2 newVelocity)
 {
 	m_velocity = newVelocity;
 }
 
-void GameObject::setIsColliding(bool collision)
+void GameObject::SetIsColliding(bool collision)
 {
 	m_isColliding = collision;
 }
 
-void GameObject::setType(GameObjectType newType)
+void GameObject::SetType(GameObjectType newType)
 {
 	m_type = newType;
 }

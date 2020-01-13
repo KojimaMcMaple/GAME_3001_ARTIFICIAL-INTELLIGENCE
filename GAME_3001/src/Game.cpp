@@ -2,12 +2,12 @@
 
 Game* Game::s_pInstance = 0;
 
-SDL_Renderer * Game::getRenderer()
+SDL_Renderer * Game::GetRenderer()
 {
 	return m_pRenderer;
 }
 
-glm::vec2 Game::getMousePosition()
+glm::vec2 Game::GetMousePosition()
 {
 	return m_mousePosition;
 }
@@ -23,6 +23,7 @@ Game::~Game()
 void Game::createGameObjects()
 {
 	m_pPlayer = new Player();
+	enemy_ptr = new Enemy();
 	m_pIsland = new Island();
 	m_pOcean = new Ocean();
 
@@ -32,7 +33,7 @@ void Game::createGameObjects()
 	}
 }
 
-bool Game::init(const char* title, int xpos, int ypos, int height, int width, bool fullscreen)
+bool Game::Init(const char* title, int xpos, int ypos, int height, int width, bool fullscreen)
 {
 	int flags = 0;
 
@@ -87,37 +88,39 @@ bool Game::init(const char* title, int xpos, int ypos, int height, int width, bo
 	return true;
 }
 
-void Game::render()
+void Game::Render()
 {
 	SDL_RenderClear(m_pRenderer); // clear the renderer to the draw colour
 
-	m_pOcean->draw();
-	m_pIsland->draw();
-	m_pPlayer->draw();
+	m_pOcean->Draw();
+	m_pIsland->Draw();
+	enemy_ptr->Draw();
+	m_pPlayer->Draw();
 
 	for (Cloud* cloud : m_pClouds) {
-		cloud->draw();
+		cloud->Draw();
 	}
 
 	SDL_RenderPresent(m_pRenderer); // draw to the screen
 }
 
-void Game::update()
+void Game::Update()
 {
-	m_pPlayer->update();
-	m_pIsland->update();
-	m_pOcean->update();
+	m_pPlayer->Update();
+	enemy_ptr->Update();
+	m_pIsland->Update();
+	m_pOcean->Update();
 	
 	Collision::squaredRadiusCheck(m_pPlayer, m_pIsland);
 
 	for (Cloud* cloud : m_pClouds) {
-		cloud->update();
+		cloud->Update();
 		Collision::squaredRadiusCheck(m_pPlayer, cloud);
 	}
 
 }
 
-void Game::clean()
+void Game::Clean()
 {
 	std::cout << "cleaning game" << std::endl;
 
@@ -126,7 +129,7 @@ void Game::clean()
 	SDL_Quit();
 }
 
-void Game::handleEvents()
+void Game::HandleEvents()
 {
 	SDL_Event event;
 	if (SDL_PollEvent(&event))

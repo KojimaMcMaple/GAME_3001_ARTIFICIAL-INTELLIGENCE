@@ -15,6 +15,7 @@
 
 // Game Objects
 #include "Player.h"
+#include "Enemy.h"
 #include "Island.h"
 #include "Ocean.h"
 #include "Cloud.h"
@@ -36,23 +37,23 @@ public:
 	}
 
 	// simply set the running variable to true
-	void init() { m_bRunning = true; }
+	void Init() { m_bRunning = true; }
 
-	bool init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
+	bool Init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
 
 	// public functions
-	void render();
-	void update();
-	void handleEvents();
-	void clean();
+	void Render();
+	void Update();
+	void HandleEvents();
+	void Clean();
 
 	// a function to access the private running variable
-	bool running() { return m_bRunning; }
+	bool IsRunning() { return m_bRunning; }
 	
 
 	// getters
-	SDL_Renderer* getRenderer();
-	glm::vec2 getMousePosition();
+	SDL_Renderer* GetRenderer();
+	glm::vec2 GetMousePosition();
 
 private:
 	Game();
@@ -69,6 +70,7 @@ private:
 
 	// GameObjects
 	Player* m_pPlayer;
+	Enemy* enemy_ptr;
 	Island* m_pIsland;
 	Ocean* m_pOcean;
 

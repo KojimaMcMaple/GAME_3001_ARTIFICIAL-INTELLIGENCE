@@ -4,14 +4,14 @@
 Cloud::Cloud()
 {
 	TheTextureManager::Instance()->load("../Assets/textures/cloud.png",
-		"cloud", TheGame::Instance()->getRenderer());
+		"cloud", TheGame::Instance()->GetRenderer());
 
 	glm::vec2 size = TheTextureManager::Instance()->getTextureSize("cloud");
-	setWidth(size.x);
-	setHeight(size.y);
+	SetWidth(size.x);
+	SetHeight(size.y);
 	_reset();
-	setIsColliding(false);
-	setType(GameObjectType::CLOUD);
+	SetIsColliding(false);
+	SetType(GameObjectType::CLOUD);
 
 	TheTextureManager::Instance()->setAlpha("cloud", 128);
 
@@ -23,45 +23,45 @@ Cloud::~Cloud()
 {
 }
 
-void Cloud::draw()
+void Cloud::Draw()
 {
-	int xComponent = getPosition().x;
-	int yComponent = getPosition().y;
+	int xComponent = GetPosition().x;
+	int yComponent = GetPosition().y;
 	TheTextureManager::Instance()->draw("cloud", xComponent, yComponent,
-		TheGame::Instance()->getRenderer(), true);
+		TheGame::Instance()->GetRenderer(), true);
 }
 
-void Cloud::update()
+void Cloud::Update()
 {
 	_move();
 	_checkBounds();
 }
 
-void Cloud::clean()
+void Cloud::Clean()
 {
 }
 
 void Cloud::_move()
 {
-	glm::vec2 newPosition = getPosition() + getVelocity();
-	setPosition(newPosition);
+	glm::vec2 newPosition = GetPosition() + GetVelocity();
+	SetPosition(newPosition);
 }
 
 void Cloud::_checkBounds()
 {
-	if (getPosition().y > 480 + getHeight()) {
+	if (GetPosition().y > 480 + GetHeight()) {
 		_reset();
 	}
 }
 
 void Cloud::_reset()
 {
-	setIsColliding(false);
+	SetIsColliding(false);
 	int randomVelocityX = (rand() % 5) - 2;
 	int randomVelocityY = (rand() % 6) + 5;
-	setVelocity(glm::vec2(randomVelocityX, randomVelocityY));
-	int halfWidth = getWidth() * 0.5;
-	int xComponent = rand() % (640 - getWidth()) + halfWidth + 1;
-	int yComponent = -getHeight();
-	setPosition(glm::vec2(xComponent, yComponent));
+	SetVelocity(glm::vec2(randomVelocityX, randomVelocityY));
+	int halfWidth = GetWidth() * 0.5;
+	int xComponent = rand() % (640 - GetWidth()) + halfWidth + 1;
+	int yComponent = -GetHeight();
+	SetPosition(glm::vec2(xComponent, yComponent));
 }

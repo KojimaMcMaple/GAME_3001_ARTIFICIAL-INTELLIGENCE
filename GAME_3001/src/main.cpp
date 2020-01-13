@@ -35,15 +35,15 @@ int main(int argc, char * args[])
 	freopen("CON", "w", stdout);
 
 
-	TheGame::Instance()->init("Hello World", 100, 100, 640, 480, false);
+	TheGame::Instance()->Init("Hello World", 100, 100, 640, 480, false);
 
-	while (TheGame::Instance()->running())
+	while (TheGame::Instance()->IsRunning())
 	{
 		frameStart = SDL_GetTicks();
 
-		TheGame::Instance()->handleEvents();
-		TheGame::Instance()->update();
-		TheGame::Instance()->render();
+		TheGame::Instance()->HandleEvents();
+		TheGame::Instance()->Update();
+		TheGame::Instance()->Render();
 
 		frameTime = SDL_GetTicks() - frameStart;
 		if (frameTime< DELAY_TIME)
@@ -53,7 +53,7 @@ int main(int argc, char * args[])
 
 	}
 
-	TheGame::Instance()->clean();
+	TheGame::Instance()->Clean();
 
 	return 0;
 }

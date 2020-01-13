@@ -21,32 +21,32 @@ public:
 	~GameObject();
 
 	// Draw the object
-	virtual void draw() = 0;
+	virtual void Draw() = 0;
 
 	// Update the object
-	virtual void update() = 0;
+	virtual void Update() = 0;
 
 	// remove anything that needs to be deleted
-	virtual void clean() = 0;
+	virtual void Clean() = 0;
 
 	// getters for common variables
-	glm::vec2 getPosition();
-	glm::vec2 getRotation();
-	glm::vec2 getScale();
-	glm::vec2 getVelocity();
-	glm::vec2 getAcceleration();
-	int getWidth();
-	int getHeight();
-	bool getIsColliding();
-	GameObjectType getType();
+	glm::vec2 GetPosition();
+	glm::vec2 GetRotation();
+	glm::vec2 GetScale();
+	glm::vec2 GetVelocity();
+	glm::vec2 GetAcceleration();
+	int GetWidth();
+	int GetHeight();
+	bool GetIsColliding();
+	GameObjectType GetType();
 
 	// setters for common variables
-	void setPosition(glm::vec2 newPosition);
-	void setWidth(int newWidth);
-	void setHeight(int newHeight);
-	void setVelocity(glm::vec2 newVelocity);
-	void setIsColliding(bool collision);
-	void setType(GameObjectType newType);
+	void SetPosition(glm::vec2 newPosition);
+	void SetWidth(int newWidth);
+	void SetHeight(int newHeight);
+	void SetVelocity(glm::vec2 newVelocity);
+	void SetIsColliding(bool collision);
+	void SetType(GameObjectType newType);
 
 
 private:

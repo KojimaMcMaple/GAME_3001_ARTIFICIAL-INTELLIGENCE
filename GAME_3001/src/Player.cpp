@@ -3,14 +3,14 @@
 
 Player::Player()
 {
-	TheTextureManager::Instance()->load("../Assets/textures/plane.png", "player", TheGame::Instance()->getRenderer());
-	setPosition(glm::vec2(0, 430.0f));
+	TheTextureManager::Instance()->load("../Assets/textures/plane.png", "player", TheGame::Instance()->GetRenderer());
+	SetPosition(glm::vec2(0, 430.0f));
 
 	glm::vec2 size = TheTextureManager::Instance()->getTextureSize("player");
-	setWidth(size.x);
-	setHeight(size.y);
-	setIsColliding(false);
-	setType(GameObjectType::PLAYER);
+	SetWidth(size.x);
+	SetHeight(size.y);
+	SetIsColliding(false);
+	SetType(GameObjectType::PLAYER);
 
 	TheSoundManager::Instance()->load("../Assets/audio/engine.ogg",
 		"engine", sound_type::SOUND_MUSIC);
@@ -22,18 +22,18 @@ Player::~Player()
 {
 }
 
-void Player::draw()
+void Player::Draw()
 {
-	TheTextureManager::Instance()->draw("player", getPosition().x, getPosition().y, TheGame::Instance()->getRenderer(), true);
+	TheTextureManager::Instance()->draw("player", GetPosition().x, GetPosition().y, TheGame::Instance()->GetRenderer(), true);
 }
 
-void Player::update()
+void Player::Update()
 {
-	glm::vec2 mouseVector = TheGame::Instance()->getMousePosition();
+	glm::vec2 mouseVector = TheGame::Instance()->GetMousePosition();
 
-	setPosition(glm::vec2(mouseVector.x, getPosition().y));
+	SetPosition(glm::vec2(mouseVector.x, GetPosition().y));
 }
 
-void Player::clean()
+void Player::Clean()
 {
 }

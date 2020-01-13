@@ -4,48 +4,48 @@
 Ocean::Ocean()
 {
 	TheTextureManager::Instance()->load("../Assets/textures/ocean.gif",
-		"ocean", TheGame::Instance()->getRenderer());
+		"ocean", TheGame::Instance()->GetRenderer());
 
 	glm::vec2 size = TheTextureManager::Instance()->getTextureSize("ocean");
-	setWidth(size.x);
-	setHeight(size.y);
-	setVelocity(glm::vec2(0, 5));
+	SetWidth(size.x);
+	SetHeight(size.y);
+	SetVelocity(glm::vec2(0, 5));
 	_reset();
-	setIsColliding(false);
-	setType(GameObjectType::OCEAN);
+	SetIsColliding(false);
+	SetType(GameObjectType::OCEAN);
 }
 
 Ocean::~Ocean()
 {
 }
 
-void Ocean::draw()
+void Ocean::Draw()
 {
-	int xComponent = getPosition().x;
-	int yComponent = getPosition().y;
+	int xComponent = GetPosition().x;
+	int yComponent = GetPosition().y;
 	TheTextureManager::Instance()->draw("ocean", xComponent, yComponent,
-		TheGame::Instance()->getRenderer());
+		TheGame::Instance()->GetRenderer());
 }
 
-void Ocean::update()
+void Ocean::Update()
 {
 	_move();
 	_checkBounds();
 }
 
-void Ocean::clean()
+void Ocean::Clean()
 {
 }
 
 void Ocean::_move()
 {
-	glm::vec2 newPosition = getPosition() + getVelocity();
-	setPosition(newPosition);
+	glm::vec2 newPosition = GetPosition() + GetVelocity();
+	SetPosition(newPosition);
 }
 
 void Ocean::_checkBounds()
 {
-	if (getPosition().y >= 0) 
+	if (GetPosition().y >= 0) 
 	{
 		_reset();
 	}
@@ -53,5 +53,5 @@ void Ocean::_checkBounds()
 
 void Ocean::_reset()
 {
-	setPosition(glm::vec2(0, -960));
+	SetPosition(glm::vec2(0, -960));
 }

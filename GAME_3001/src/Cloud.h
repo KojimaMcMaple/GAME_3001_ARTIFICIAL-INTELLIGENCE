@@ -13,9 +13,9 @@ public:
 	~Cloud();
 
 	// Inherited via GameObject
-	void draw() override;
-	void update() override;
-	void clean() override;
+	void Draw() override;
+	void Update() override;
+	void Clean() override;
 private:
 	void _move();
 	void _checkBounds();
