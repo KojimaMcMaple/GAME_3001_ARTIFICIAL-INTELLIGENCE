@@ -8,7 +8,7 @@ Enemy::Enemy() {
 	glm::vec2 size = TheTextureManager::Instance()->getTextureSize("enemy");
 	SetWidth(size.x);
 	SetHeight(size.y);
-	SetVelocity(glm::vec2( 2, 0));
+	SetVelocity(glm::vec2( 3, 0));
 	SetPosition(glm::vec2(GetWidth() * 0.5f, GetHeight()));
 	SetIsColliding(false);
 	SetType(GameObjectType::ENEMY);
@@ -41,9 +41,9 @@ void Enemy::_Move() {
 
 void Enemy::_CheckBounds() {
 	if (GetPosition().x >= 640 - GetWidth() * 0.5f) {
-		SetVelocity(glm::vec2(-2.0f, 0.0f));
+		SetVelocity(glm::vec2(-3.0f, 0.0f));
 	}
 	if (GetPosition().x <= GetWidth() * 0.5f) {
-		SetVelocity(glm::vec2(2.0f, 0.0f));
+		SetVelocity(glm::vec2(3.0f, 0.0f));
 	}
 }

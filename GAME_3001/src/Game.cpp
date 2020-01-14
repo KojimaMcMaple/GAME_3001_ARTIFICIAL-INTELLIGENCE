@@ -20,7 +20,7 @@ Game::~Game()
 {
 }
 
-void Game::createGameObjects()
+void Game::CreateGameObjects()
 {
 	m_pPlayer = new Player();
 	enemy_ptr = new Enemy();
@@ -68,7 +68,7 @@ bool Game::Init(const char* title, int xpos, int ypos, int height, int width, bo
 			}
 
 			//TheTextureManager::Instance()->load("../../Assets/textures/animate-alpha.png", "animate", m_pRenderer);
-			createGameObjects();
+			CreateGameObjects();
 		}
 		else 
 		{

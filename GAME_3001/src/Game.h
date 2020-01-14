@@ -78,7 +78,7 @@ private:
 	int m_cloudNum = 3;
 	std::vector<Cloud*> m_pClouds;
 
-	void createGameObjects();
+	void CreateGameObjects();
 
 	glm::vec2 m_mousePosition;
 };
