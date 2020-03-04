@@ -48,17 +48,19 @@ private:
 
 	void PopulateGrid();
 
+	void ComputeDistanceForOneTile(Tile* in_tile);
 	void m_computeTileValues();
 
 	// pathfinding functions & variables
 	Tile* m_findLowestCostTile(const std::vector<Tile*>& neighbours);
 	void m_findShortestPath();
-	Tile* GetNeighborWithWantedState(const Tile* in_tile, const TileState in_state);
-	bool HasNeighborWithWantedState(const Tile* in_tile, const TileState in_state);
+	Tile* GetNeighborWithWantedState(Tile* in_tile, const TileState in_state);
 	bool HasViablePath();
 	std::vector<Tile*> shortest_path_;
 	std::vector<Tile*> m_openList;
 	std::vector<Tile*> m_closedList;
+	std::vector<Tile*> impassable_list_;
+	void SetStateForTileList(std::vector<Tile*> in_list, const TileState in_state);
 	Heuristic m_heuristic;
 	void m_selectHeuristic(Heuristic heuristic);
 

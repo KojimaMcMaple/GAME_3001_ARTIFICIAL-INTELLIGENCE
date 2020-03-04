@@ -18,7 +18,6 @@ void PlayScene::m_resetGrid()
 			tile->setTileState(UNDEFINED);
 			m_openList.pop_back();
 		}
-
 		for (auto tile : m_closedList)
 		{
 			tile->setTileState(UNDEFINED);
@@ -102,6 +101,7 @@ void PlayScene::m_spawnShip()
 	
 	const auto randomTileIndex = m_spawnObject(m_pShip);
 	m_pGrid[randomTileIndex]->setTileState(START);
+	m_pShip->setState(IDLE);
 }
 
 void PlayScene::m_spawnPlanet()
@@ -119,19 +119,49 @@ void PlayScene::m_spawnPlanet()
 
 void PlayScene::PopulateGrid()
 {
+	for (auto tile : impassable_list_)
+	{
+		tile->setTileState(UNDEFINED);
+		ComputeDistanceForOneTile(tile);
+		impassable_list_.pop_back();
+	}
+	m_findShortestPath();
 	// RANDOMIZE TILE TEXTURE, SET TILE STATE IF TEXTURE IS OBSTACLE
 	for (auto tile : m_pGrid) {
 		if (tile->getTileState() != START && tile->getTileState() != GOAL) {
 			auto tile_type = static_cast<TileType>(rand() % NUM_OF_TILE_TYPES);
 			tile->SetTileType(tile_type);
 			if (tile_type > DEFAULT_TILE) {
-				tile->setTileState(IMPASSABLE);
-				/*if (!HasViablePath()) {
-					tile->SetTileType(DEFAULT_TILE);
-					tile->setTileState(UNDEFINED);
-				}*/
+				if (tile->getTileState() == OPEN) {
+					TileState original_state = tile->getTileState();
+					tile->setTileState(IMPASSABLE);
+					impassable_list_.push_back(tile);
+					ComputeDistanceForOneTile(tile);
+					if (!HasViablePath()) {
+						tile->SetTileType(DEFAULT_TILE);
+						tile->setTileState(original_state);
+						impassable_list_.pop_back();
+						ComputeDistanceForOneTile(tile);
+					}
+				}
+				else {
+					tile->setTileState(IMPASSABLE);
+					impassable_list_.push_back(tile);
+					ComputeDistanceForOneTile(tile);
+				}
 			}
 		}
+	}
+}
+
+void PlayScene::ComputeDistanceForOneTile(Tile* in_tile)
+{
+	if (in_tile->getTileState() == IMPASSABLE) {
+		in_tile->GetValueLabel()->setText("INF");
+	}
+	else {
+		in_tile->setHeuristic(m_heuristic);
+		in_tile->setTargetDistance(m_pPlanet->getTile()->getGridPosition());
 	}
 }
 
@@ -139,8 +169,7 @@ void PlayScene::m_computeTileValues()
 {
 	for (auto tile : m_pGrid)
 	{
-		tile->setHeuristic(m_heuristic);
-		tile->setTargetDistance(m_pPlanet->getTile()->getGridPosition());
+		ComputeDistanceForOneTile(tile);
 	}
 }
 
@@ -202,48 +231,70 @@ void PlayScene::m_findShortestPath()
 	}
 }
 
-Tile* PlayScene::GetNeighborWithWantedState(const Tile* in_tile, const TileState in_state)
+Tile* PlayScene::GetNeighborWithWantedState(Tile* in_tile, const TileState in_state)
 {
-	for (auto neighbour_tile : in_tile->getNeighbours()) {
-		if (neighbour_tile != nullptr) {
-			if (neighbour_tile->getTileState() == in_state) {
-				return neighbour_tile;
+	if (in_tile != nullptr) {
+		for (auto neighbour_tile : in_tile->getNeighbours()) {
+			if (neighbour_tile != nullptr) {
+				if (neighbour_tile->getTileState() == in_state) {
+					return neighbour_tile;
+				}
 			}
 		}
 	}
-	return nullptr;
-}
 
-bool PlayScene::HasNeighborWithWantedState(const Tile* in_tile, const TileState in_state)
-{
-	for (auto neighbour_tile : in_tile->getNeighbours()) {
-		if (neighbour_tile != nullptr) {
-			if (neighbour_tile->getTileState() == in_state) {
-				return true;
-			}
-		}
-	}
-	return false;
+	return nullptr;
 }
 
 bool PlayScene::HasViablePath()
 {
 	// RUN m_findShortestPath, ADD TILES TO shortest_path_, CLEAN shortest_path_ IF FALSE
-
 	m_findShortestPath();
 	
-	// START WITH SHIP TILES, THEN WORK OUT IF ADJACENT TILES HAVE AN OPEN TILE
-	auto test_tile = m_pShip->getTile();
-	while (!HasNeighborWithWantedState(test_tile, GOAL)) {
-		if (!HasNeighborWithWantedState(test_tile, OPEN)) {
-			return false;
+	std::vector<Tile*> checked_tiles;
+	// START WITH SHIP TILE, THEN WORK OUT IF ADJACENT TILES HAVE AN OPEN TILE
+	auto test_tile = GetNeighborWithWantedState(m_pShip->getTile(), OPEN);
+	if (test_tile == nullptr) {
+		if (GetNeighborWithWantedState(test_tile, GOAL) != nullptr) {
+			std::cout << "returning true 1" << std::endl;
+			return true;
 		}
-		test_tile = GetNeighborWithWantedState(test_tile, OPEN); // URGENT FIX: DO NOT ALLOW SWITCHING BETWEEN 2 OPEN TILES
-		if (test_tile == nullptr) {
+		else {
+			std::cout << "EARLY TERMINATION" << std::endl;
 			return false;
 		}
 	}
+	checked_tiles.push_back(test_tile);
+	test_tile->setTileState(CLOSED);
+	while (GetNeighborWithWantedState(test_tile, GOAL) == nullptr) {
+		Tile* next_tile = nullptr;
+		for (const auto neighbour_tile : test_tile->getNeighbours()) { //copied from GetNeighborWithWantedState()
+			if (neighbour_tile != nullptr) {
+				if (neighbour_tile->getTileState() == OPEN) {
+					checked_tiles.push_back(neighbour_tile);
+					next_tile = neighbour_tile;
+					test_tile = neighbour_tile;
+					//neighbour_tile->setTileState(CLOSED);
+					break;
+				}
+			}
+		}
+		checked_tiles.back()->setTileState(CLOSED);
+		if (next_tile == nullptr) {
+			SetStateForTileList(checked_tiles, OPEN);
+			return false;
+		}
+	}
+	SetStateForTileList(checked_tiles, OPEN);
+	std::cout << "returning true 2" << std::endl;
 	return true;
+}
+
+void PlayScene::SetStateForTileList(std::vector<Tile*> in_list, const TileState in_state)
+{
+	for (auto tile : in_list) {
+		tile->setTileState(in_state);
+	}
 }
 
 void PlayScene::m_selectHeuristic(Heuristic heuristic)
@@ -414,10 +465,25 @@ void PlayScene::m_updateUI()
 	}
 
 	ImGui::SameLine();
+	
+	if (ImGui::Button("Respawn Obstacles"))
+	{
+		PopulateGrid();
+	}
+
+	ImGui::SameLine();
 
 	if (ImGui::Button("Find Shortest Path"))
 	{
 		m_findShortestPath();
+	}
+	
+	ImGui::SameLine();
+
+	if (ImGui::Button("Move Ship"))
+	{
+		m_pShip->setTarget(m_pPlanet->getPosition());
+		m_pShip->setState(SEEK);
 	}
 
 	if(ImGui::CollapsingHeader("Heuristic Options"))
@@ -475,6 +541,7 @@ void PlayScene::start()
 
 	m_spawnShip();
 
+
 	PopulateGrid();
 }
 
@@ -511,8 +578,8 @@ void PlayScene::draw()
 
 void PlayScene::update()
 {
-	/*m_pTile->update();
-	m_pShip->update();*/
+	//m_pTile->update();
+	m_pShip->update();
 
 	if (m_displayUI)
 	{

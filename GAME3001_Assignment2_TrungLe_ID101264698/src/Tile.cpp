@@ -204,7 +204,7 @@ void Tile::setTileStateLabel(const std::string& closed_open) const
 	m_pClosedOpenLabel->setColour(blue);
 }
 
-std::vector<Tile*> Tile::getNeighbours() const
+std::vector<Tile*> Tile::getNeighbours()
 {
 	return m_pNeighbours;
 }
@@ -212,4 +212,9 @@ std::vector<Tile*> Tile::getNeighbours() const
 void Tile::setHeuristic(const Heuristic heuristic)
 {
 	m_heuristic = heuristic;
+}
+
+Label* Tile::GetValueLabel()
+{
+	return m_pValueLabel;
 }

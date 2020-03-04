@@ -52,9 +52,11 @@ public:
 
 	void setTileStateLabel(const std::string& closed_open) const;
 
-	std::vector<Tile*> getNeighbours() const;
+	std::vector<Tile*> getNeighbours();
 
 	void setHeuristic(Heuristic heuristic);
+
+	Label* GetValueLabel();
 
 private:
 	float m_cost = Config::TILE_COST;
