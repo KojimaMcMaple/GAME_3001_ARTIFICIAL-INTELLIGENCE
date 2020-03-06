@@ -54,9 +54,10 @@ private:
 	// pathfinding functions & variables
 	Tile* m_findLowestCostTile(const std::vector<Tile*>& neighbours);
 	void m_findShortestPath();
+	void MoveStartToGoal();
 	Tile* GetNeighborWithWantedState(Tile* in_tile, const TileState in_state);
 	bool HasViablePath();
-	std::vector<Tile*> shortest_path_;
+	//std::vector<Tile*> shortest_path_;
 	std::vector<Tile*> m_openList;
 	std::vector<Tile*> m_closedList;
 	std::vector<Tile*> impassable_list_;

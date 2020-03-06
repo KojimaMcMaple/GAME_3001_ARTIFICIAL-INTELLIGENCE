@@ -49,7 +49,7 @@ private:
 	Player* m_pPlayer;
 	Island* m_pIsland;
 	Ocean* m_pOcean;
-	ship* m_pShip;
+	Ship* m_pShip;
 	Target* m_pTarget;
 	UI* title_screen_ptr_;
 	UI* pause_screen_ptr_;
@@ -100,7 +100,7 @@ public:
 	FSM& GetFSM();
 	UI& GetTitleScreen();
 	UI& GetPauseScreen();
-	ship& GetShip();
+	Ship& GetShip();
 	Target& GetTarget();
 };
 

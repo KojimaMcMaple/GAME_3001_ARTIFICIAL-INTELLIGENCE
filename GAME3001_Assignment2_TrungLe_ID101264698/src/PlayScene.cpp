@@ -231,6 +231,19 @@ void PlayScene::m_findShortestPath()
 	}
 }
 
+void PlayScene::MoveStartToGoal()
+{
+	if (HasViablePath()) {
+		std::vector<glm::vec2> open_position_list;
+		for (auto node : m_openList) {
+			open_position_list.push_back(node->getPosition());
+		}
+		open_position_list.push_back(m_pPlanet->getPosition());
+		m_pShip->SetTargetPath(open_position_list);
+		m_pShip->setState(TRAVERSE);
+	}
+}
+
 Tile* PlayScene::GetNeighborWithWantedState(Tile* in_tile, const TileState in_state)
 {
 	if (in_tile != nullptr) {
@@ -242,7 +255,6 @@ Tile* PlayScene::GetNeighborWithWantedState(Tile* in_tile, const TileState in_st
 			}
 		}
 	}
-
 	return nullptr;
 }
 
@@ -256,7 +268,6 @@ bool PlayScene::HasViablePath()
 	auto test_tile = GetNeighborWithWantedState(m_pShip->getTile(), OPEN);
 	if (test_tile == nullptr) {
 		if (GetNeighborWithWantedState(test_tile, GOAL) != nullptr) {
-			std::cout << "returning true 1" << std::endl;
 			return true;
 		}
 		else {
@@ -286,7 +297,6 @@ bool PlayScene::HasViablePath()
 		}
 	}
 	SetStateForTileList(checked_tiles, OPEN);
-	std::cout << "returning true 2" << std::endl;
 	return true;
 }
 
@@ -482,8 +492,7 @@ void PlayScene::m_updateUI()
 
 	if (ImGui::Button("Move Ship"))
 	{
-		m_pShip->setTarget(m_pPlanet->getPosition());
-		m_pShip->setState(SEEK);
+		MoveStartToGoal();
 	}
 
 	if(ImGui::CollapsingHeader("Heuristic Options"))

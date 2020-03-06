@@ -36,7 +36,7 @@ UI& Game::GetPauseScreen()
 	return *pause_screen_ptr_;
 }
 
-ship& Game::GetShip()
+Ship& Game::GetShip()
 {
 	// TODO: insert return statement here
 	return *m_pShip;
@@ -60,7 +60,7 @@ void Game::createGameObjects()
 {
 	title_screen_ptr_ = new UI("title", "../Assets/textures/Title_Screen.png", 0, 0, Globals::sWindowWidth, Globals::sWindowHeight, 0, 0, Globals::sWindowWidth, Globals::sWindowHeight);
 	
-	m_pShip = new ship();
+	m_pShip = new Ship();
 	m_pTarget = new Target();
 }
 

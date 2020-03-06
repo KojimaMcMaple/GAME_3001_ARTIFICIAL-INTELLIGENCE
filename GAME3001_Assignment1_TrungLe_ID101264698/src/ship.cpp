@@ -4,7 +4,7 @@
 #include "GLM/gtx/rotate_vector.hpp"
 
 
-ship::ship()
+Ship::Ship()
 {
 	TheTextureManager::Instance()->load("../Assets/textures/ship3.png", "ship", TheGame::Instance()->getRenderer());
 
@@ -25,11 +25,11 @@ ship::ship()
 }
 
 
-ship::~ship()
+Ship::~Ship()
 {
 }
 
-void ship::draw()
+void Ship::draw()
 {
 	int xComponent = getPosition().x;
 	int yComponent = getPosition().y;
@@ -38,7 +38,7 @@ void ship::draw()
 		TheGame::Instance()->getRenderer(), m_currentHeading, 255, true);
 }
 
-void ship::m_checkSteeringState()
+void Ship::m_checkSteeringState()
 {
 	switch (getState())
 	{
@@ -67,16 +67,16 @@ void ship::m_checkSteeringState()
 	}
 }
 
-void ship::update()
+void Ship::update()
 {
 	m_checkSteeringState();
 }
 
-void ship::clean()
+void Ship::clean()
 {
 }
 
-void ship::turnRight()
+void Ship::turnRight()
 {
 	m_currentHeading += (m_turnRate < GetAngleOffset()) ? m_turnRate : GetAngleOffset();
 
@@ -90,7 +90,7 @@ void ship::turnRight()
 	m_computeTargetDirection();
 }
 
-void ship::turnLeft()
+void Ship::turnLeft()
 {
 	m_currentHeading -= (m_turnRate < GetAngleOffset()) ? m_turnRate : GetAngleOffset();
 
@@ -104,7 +104,7 @@ void ship::turnLeft()
 	m_computeTargetDirection();
 }
 
-void ship::move()
+void Ship::move()
 {
 	SetAngleToTarget(Util::signedAngle(getCurrentDirection(), m_targetDirection));
 	//std::cout << "target Direction: " << angleToTarget << std::endl;
@@ -126,52 +126,52 @@ void ship::move()
 	setPosition(newPosition);
 }
 
-glm::vec2 ship::getTargetPosition()
+glm::vec2 Ship::getTargetPosition()
 {
 	return m_targetPosition;
 }
 
-glm::vec2 ship::getCurrentDirection()
+glm::vec2 Ship::getCurrentDirection()
 {
 	return m_currentDirection;
 }
 
-float ship::getMaxSpeed()
+float Ship::getMaxSpeed()
 {
 	return m_maxSpeed;
 }
 
-float ship::GetAngleToTarget()
+float Ship::GetAngleToTarget()
 {
 	return angle_to_target_;
 }
 
-float ship::GetAngleOffset()
+float Ship::GetAngleOffset()
 {
 	return abs(abs(GetAngleToTarget() - m_turnRate));;
 }
 
-void ship::setTargetPosition(glm::vec2 newPosition)
+void Ship::setTargetPosition(glm::vec2 newPosition)
 {
 	m_targetPosition = newPosition;
 }
 
-void ship::setCurrentDirection(glm::vec2 newDirection)
+void Ship::setCurrentDirection(glm::vec2 newDirection)
 {
 	m_currentDirection = newDirection;
 }
 
-void ship::setMaxSpeed(float newSpeed)
+void Ship::setMaxSpeed(float newSpeed)
 {
 	m_maxSpeed = newSpeed;
 }
 
-void ship::SetAngleToTarget(float angle)
+void Ship::SetAngleToTarget(float angle)
 {
 	angle_to_target_ = angle;
 }
 
-void ship::m_checkBounds()
+void Ship::m_checkBounds()
 {
 
 	if (getPosition().x > 800)
@@ -196,19 +196,19 @@ void ship::m_checkBounds()
 
 }
 
-void ship::m_reset()
+void Ship::m_reset()
 {
 
 }
 
-void ship::m_changeDirection()
+void Ship::m_changeDirection()
 {
 	float x = cos(m_currentHeading * Util::Deg2Rad);
 	float y = sin(m_currentHeading * Util::Deg2Rad);
 	m_currentDirection = glm::vec2(x, y);
 }
 
-void ship::m_computeTargetDirection()
+void Ship::m_computeTargetDirection()
 {
 	glm::vec2 steeringVelocity = getTargetPosition() - getPosition();
 	std::cout << steeringVelocity.x << ", " << steeringVelocity.y << std::endl;
@@ -217,7 +217,7 @@ void ship::m_computeTargetDirection()
 	std::cout << std::endl;
 }
 
-void ship::m_computeOppositeTargetDirection()
+void Ship::m_computeOppositeTargetDirection()
 {
 	glm::vec2 steeringVelocity = getTargetPosition() - getPosition();
 	std::cout << steeringVelocity.x << ", " << steeringVelocity.y << std::endl;
@@ -226,19 +226,19 @@ void ship::m_computeOppositeTargetDirection()
 	std::cout << std::endl;
 }
 
-void ship::m_seek()
+void Ship::m_seek()
 {
 	m_computeTargetDirection();
 	/**/ // TODO: remove after move is updated 
 }
 
-void ship::m_flee()
+void Ship::m_flee()
 {
 	m_computeOppositeTargetDirection();
 	/**/ // TODO: remove after move is updated 
 }
 
-void ship::m_checkArrival()
+void Ship::m_checkArrival()
 {
 	if (Util::distance(getPosition(),getTargetPosition()) <= 3.0f)
 	{

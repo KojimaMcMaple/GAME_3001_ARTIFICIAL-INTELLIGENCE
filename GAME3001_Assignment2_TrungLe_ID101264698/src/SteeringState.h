@@ -6,6 +6,7 @@ enum SteeringState {
 	IDLE,
 	SEEK,
 	ARRIVE,
+	TRAVERSE,
 	AVOID,
 	FLEE,
 	NUM_OF_STATES

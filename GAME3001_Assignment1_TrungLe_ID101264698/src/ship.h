@@ -6,12 +6,12 @@
 #include "TextureManager.h"
 #include "SoundManager.h"
 
-class ship :
+class Ship :
 	public GameObject
 {
 public:
-	ship();
-	~ship();
+	Ship();
+	~Ship();
 
 	// Inherited via GameObject
 	void draw() override;
@@ -44,7 +44,7 @@ private:
 	void m_flee();
 	void m_checkArrival();
 
-	// ship movement
+	// Ship movement
 	void m_checkBounds();
 	void m_reset();
 	float m_maxSpeed;
