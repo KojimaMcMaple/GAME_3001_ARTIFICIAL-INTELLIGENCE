@@ -43,9 +43,12 @@ private:
 	void LoadTileTextures();
 
 	int m_spawnObject(PathFindingDisplayObject* object);
+	int SpawnObjectAtGridIdx(PathFindingDisplayObject* object, int grid_idx);
 	void ResetShipPosition();
 	void m_spawnShip();
-	void m_spawnPlanet();
+	void m_spawnPlanet();	
+	void SpawnShipAtGridIdx(int grid_idx);
+	void SpawnPlanetAtGridIdx(int grid_idx);
 
 	void PopulateGrid();
 

@@ -1,45 +1,45 @@
-#include "StartScene.h"
+#include "EndScene.h"
 #include <algorithm>
 #include "Game.h"
 #include "glm/gtx/string_cast.hpp"
 
-StartScene::StartScene()
+EndScene::EndScene()
 {
-	StartScene::start();
+	EndScene::start();
 }
 
-StartScene::~StartScene()
+EndScene::~EndScene()
 = default;
 
-void StartScene::draw()
+void EndScene::draw()
 {
 	m_pStartLabel->draw();
 	m_pInstructionsLabel->draw();
 
-	m_pShip->draw();
+	m_pPlanet->draw();
 }
 
-void StartScene::update()
+void EndScene::update()
 {
 }
 
-void StartScene::clean()
+void EndScene::clean()
 {
-	std::cout << "Clean called on StartScene" << std::endl;
-	
+	std::cout << "Clean called on EndScene" << std::endl;
+
 	delete m_pStartLabel;
 	m_pStartLabel = nullptr;
-	
+
 	delete m_pInstructionsLabel;
 	m_pInstructionsLabel = nullptr;
 
-	delete m_pShip;
-	m_pShip = nullptr;
+	delete m_pPlanet;
+	m_pPlanet = nullptr;
 
 	removeAllChildren();
 }
 
-void StartScene::handleEvents()
+void EndScene::handleEvents()
 {
 	SDL_Event event;
 	if (SDL_PollEvent(&event))
@@ -59,29 +59,29 @@ void StartScene::handleEvents()
 				TheGame::Instance()->changeSceneState(SceneState::PLAY_SCENE);
 				break;
 			case SDLK_2:
-				TheGame::Instance()->changeSceneState(SceneState::END_SCENE);
+				TheGame::Instance()->changeSceneState(SceneState::START_SCENE);
 				break;
 			}
 			break;
-
 		default:
 			break;
 		}
 	}
 }
 
-void StartScene::start()
+void EndScene::start()
 {
-	const SDL_Color blue = { 0, 0, 255, 255 };
-	m_pStartLabel = new Label("START SCENE", "Consolas", 80, blue, glm::vec2(400.0f, 40.0f));
+	SDL_SetRenderDrawColor(TheGame::Instance()->getRenderer(), 20, 20, 20, 255);
+	const SDL_Color sdl_color = { 255, 255, 255, 255 };
+	m_pStartLabel = new Label("Assignment 02 finally ends...", "Consolas", 50, sdl_color, glm::vec2(400.0f, 40.0f));
 	m_pStartLabel->setParent(this);
 	addChild(m_pStartLabel);
 
-	m_pInstructionsLabel = new Label("Press 1 to Play", "Consolas", 40, blue, glm::vec2(400.0f, 120.0f));
+	m_pInstructionsLabel = new Label("Press 2 to go back", "Consolas", 40, sdl_color, glm::vec2(400.0f, 120.0f));
 	m_pInstructionsLabel->setParent(this);
 	addChild(m_pInstructionsLabel);
 
-	m_pShip = new Ship();
-	m_pShip->setPosition(glm::vec2(400.0f, 300.0f));
-	addChild(m_pShip);
+	m_pPlanet = new Planet();
+	m_pPlanet->setPosition(glm::vec2(400.0f, 300.0f));
+	addChild(m_pPlanet);
 }

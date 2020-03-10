@@ -107,6 +107,35 @@ int PlayScene::m_spawnObject(PathFindingDisplayObject* object)
 	return randomTileIndex;
 }
 
+int PlayScene::SpawnObjectAtGridIdx(PathFindingDisplayObject* object, int grid_idx)
+{
+	m_resetGrid();
+	if (!impassable_list_.empty()) {
+		for (auto tile : impassable_list_)
+		{
+			tile->setTileState(UNDEFINED);
+			ComputeDistanceForOneTile(tile);
+			impassable_list_.pop_back();
+		}
+	}
+
+	Tile* tile = nullptr;
+	tile = m_pGrid[grid_idx];
+
+
+	if (object->getTile() != nullptr)
+	{
+		object->getTile()->setTileState(UNDEFINED);
+	}
+
+	object->setPosition(tile->getPosition());
+	object->setTile(tile);
+	object->getTile()->SetTileType(DEFAULT_TILE);
+	//ComputeDistanceForOneTile(object->getTile());
+
+	return grid_idx;
+}
+
 void PlayScene::ResetShipPosition()
 {
 	if (m_pShip->getTile() != nullptr)
@@ -137,6 +166,33 @@ void PlayScene::m_spawnPlanet()
 	}
 
 	const auto randomTileIndex = m_spawnObject(m_pPlanet);
+	auto tile = m_pGrid[randomTileIndex];
+	m_computeTileValues();
+	tile->setTileState(GOAL);
+}
+
+void PlayScene::SpawnShipAtGridIdx(int grid_idx)
+{
+	ResetShipPosition();
+	if (m_pShip->getTile() != nullptr)
+	{
+		m_pShip->getTile()->setTileState(UNDEFINED);
+	}
+
+	const auto randomTileIndex = SpawnObjectAtGridIdx(m_pShip, grid_idx);
+	m_pGrid[randomTileIndex]->setTileState(START);
+	m_pShip->setState(IDLE);
+}
+
+void PlayScene::SpawnPlanetAtGridIdx(int grid_idx)
+{
+	ResetShipPosition();
+	if (m_pPlanet->getTile() != nullptr)
+	{
+		m_pPlanet->getTile()->setTileState(UNDEFINED);
+	}
+
+	const auto randomTileIndex = SpawnObjectAtGridIdx(m_pPlanet, grid_idx);
 	auto tile = m_pGrid[randomTileIndex];
 	m_computeTileValues();
 	tile->setTileState(GOAL);
@@ -636,23 +692,29 @@ void PlayScene::UpdateSettingsUI()
 	ImGui::Text(path_cost_str.c_str());
 
 	// COMMANDS
-	if (ImGui::Button("Respawn Ship (Random)")){
-		m_spawnShip();
+    //fomula: int oneDindex = (row * length_of_row) + column;
+	if (ImGui::Button("Load Preset 1")) {
+		SpawnShipAtGridIdx(19);
+		SpawnPlanetAtGridIdx(14 * 20 + 0);
+		PopulateGrid();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Respawn Ship (Preset 1)")) {
-		m_spawnShip();
+	if (ImGui::Button("Load Preset 2")) {
+		SpawnShipAtGridIdx(7 * 20 + 9);
+		SpawnPlanetAtGridIdx(14 * 20 + 19);
+		PopulateGrid();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Respawn Ship (Preset 2)")) {
-		m_spawnShip();
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Respawn Ship (Preset 3)")) {
-		m_spawnShip();
+	if (ImGui::Button("Load Preset 3")) {
+		SpawnShipAtGridIdx(7 * 20 + 0);
+		SpawnPlanetAtGridIdx(7 * 20 + 19);
+		PopulateGrid();
 	}
 
 	ImGui::NewLine();
+	if (ImGui::Button("Respawn Ship (Random)")) {
+		m_spawnShip();
+	}
 	if (ImGui::Button("Respawn Planet")){
 		m_spawnPlanet();
 	}
