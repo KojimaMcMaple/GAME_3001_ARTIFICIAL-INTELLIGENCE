@@ -18,16 +18,25 @@ void PlayScene::m_resetGrid()
 			tile->setTileState(UNDEFINED);
 			m_openList.pop_back();
 		}
+		m_openList.clear();
+		m_openList.resize(0);
+		m_openList.shrink_to_fit();
 		for (auto tile : m_closedList)
 		{
 			tile->setTileState(UNDEFINED);
 			m_closedList.pop_back();
 		}
+		m_closedList.clear();
+		m_closedList.resize(0);
+		m_closedList.shrink_to_fit();
 		for (auto tile : shortest_path_)
 		{
 			tile->setTileState(UNDEFINED);
 			shortest_path_.pop_back();
 		}
+		shortest_path_.clear();
+		shortest_path_.resize(0);
+		shortest_path_.shrink_to_fit();
 }
 
 void PlayScene::m_buildGrid()
@@ -142,7 +151,8 @@ void PlayScene::PopulateGrid()
 		ComputeDistanceForOneTile(tile);
 		impassable_list_.pop_back();
 	}
-	//m_findShortestPath();
+	m_findShortestPath();
+	std::cout << "generating asteroids..." << std::endl;
 	// RANDOMIZE TILE TEXTURE, SET TILE STATE IF TEXTURE IS OBSTACLE
 	for (auto tile : m_pGrid) {
 		if (tile->getTileState() != START && tile->getTileState() != GOAL) {
@@ -150,16 +160,19 @@ void PlayScene::PopulateGrid()
 			tile->SetTileType(tile_type);
 			if (tile_type > DEFAULT_TILE) {
 				if (tile->getTileState() == OPEN) {
-					TileState original_state = tile->getTileState();
+					//TileState original_state = tile->getTileState();
 					tile->setTileState(IMPASSABLE);
 					impassable_list_.push_back(tile);
 					ComputeDistanceForOneTile(tile);
-					//if (!HasViablePath()) {
-					//	tile->SetTileType(DEFAULT_TILE);
-					//	tile->setTileState(original_state);
-					//	impassable_list_.pop_back();
-					//	ComputeDistanceForOneTile(tile);
-					//}
+					m_findShortestPath();
+					if (path_cost_ == -1) {
+						tile->SetTileType(DEFAULT_TILE);
+						//tile->setTileState(original_state);
+						tile->setTileState(UNDEFINED);
+						impassable_list_.pop_back();
+						ComputeDistanceForOneTile(tile);
+						m_findShortestPath();
+					}
 				}
 				else {
 					tile->setTileState(IMPASSABLE);
@@ -209,6 +222,9 @@ Tile* PlayScene::m_findLowestCostTile(const std::vector<Tile*>& neighbours)
 					minTile = tile;
 				}
 			}
+			else {
+				//std::cout << "Tile state of " << tile->getGridPosition().x << " " << tile->getGridPosition().y << " is " << tile->getTileState() << std::endl;
+			}
 		}
 	}
 	return minTile;
@@ -218,8 +234,9 @@ void PlayScene::m_findShortestPath()
 {
 	m_resetGrid();
 	//m_computeTileValues();
-	std::cout << "finding shortest... ..." << std::endl;
+	std::cout << "finding shortest. . ." << std::endl;
 	auto tile = m_pShip->getTile();
+	//std::cout << "Ship pos " << tile->getGridPosition().x << " " << tile->getGridPosition().y << std::endl;
 	path_cost_ = 0;
 	while(tile->getTileState() != GOAL)
 	{
@@ -233,9 +250,12 @@ void PlayScene::m_findShortestPath()
 			m_resetGrid();
 			break;
 		}
+		else if (tile->getTileState() == GOAL) {
+			path_cost_ += tile->getTileValue();
+		}
 		else {
 			shortest_path_.push_back(tile);
-			path_cost_ += tile->GetTileType();
+			path_cost_ += tile->getTileValue();
 		}
 
 		// now for every tile in the neighbours vector
@@ -716,7 +736,7 @@ void PlayScene::start()
 
 	m_spawnPlanet();
 
-	//PopulateGrid();
+	PopulateGrid();
 }
 
 PlayScene::PlayScene()
