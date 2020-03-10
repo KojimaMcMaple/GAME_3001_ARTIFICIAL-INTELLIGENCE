@@ -60,9 +60,11 @@ void StartScene::handleEvents()
 				TheGame::Instance()->quit();
 				break;
 			case SDLK_1:
+				TheSoundManager::Instance()->playSound("equip", 0);
 				TheGame::Instance()->changeSceneState(SceneState::PLAY_SCENE);
 				break;
 			case SDLK_2:
+				TheSoundManager::Instance()->playSound("equip", 0);
 				TheGame::Instance()->changeSceneState(SceneState::END_SCENE);
 				break;
 			}
@@ -76,6 +78,8 @@ void StartScene::handleEvents()
 
 void StartScene::start()
 {
+	TheSoundManager::Instance()->playSound("intro", 0);
+	
 	SDL_SetRenderDrawColor(TheGame::Instance()->getRenderer(), 20, 20, 20, 255);
 	const SDL_Color sdl_color = { 255, 255, 255, 255 };
 	m_pStartLabel = new Label("Assignment 02", "Consolas", 80, sdl_color, glm::vec2(400.0f, 40.0f));

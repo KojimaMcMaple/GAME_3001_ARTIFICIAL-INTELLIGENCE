@@ -56,9 +56,11 @@ void EndScene::handleEvents()
 				TheGame::Instance()->quit();
 				break;
 			case SDLK_1:
+				TheSoundManager::Instance()->playSound("equip", 0);
 				TheGame::Instance()->changeSceneState(SceneState::PLAY_SCENE);
 				break;
 			case SDLK_2:
+				TheSoundManager::Instance()->playSound("equip", 0);
 				TheGame::Instance()->changeSceneState(SceneState::START_SCENE);
 				break;
 			}

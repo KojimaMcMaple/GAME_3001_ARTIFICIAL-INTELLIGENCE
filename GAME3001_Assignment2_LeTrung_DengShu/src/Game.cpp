@@ -82,7 +82,11 @@ bool Game::init(const char* title, const int x, const int y, const int width, co
 		std::cout << "SDL init failure" << std::endl;
 		return false; //SDL could not intialize
 	}
-
+	TheSoundManager::Instance()->load("../Assets/audio/MGS_Encounter.mp3", "encounter", SOUND_MUSIC);
+	TheSoundManager::Instance()->load("../Assets/audio/Konami Intro.wav", "intro", SOUND_SFX);
+	TheSoundManager::Instance()->load("../Assets/audio/equip.wav", "equip", SOUND_SFX);
+	TheSoundManager::Instance()->load("../Assets/audio/Menu.wav", "menu", SOUND_SFX);
+	TheSoundManager::Instance()->load("../Assets/audio/New item.wav", "item", SOUND_SFX);
 	std::cout << "init success" << std::endl;
 	m_bRunning = true; // everything initialized successfully - start the main loop
 

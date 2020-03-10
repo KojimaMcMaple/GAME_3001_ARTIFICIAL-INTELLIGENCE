@@ -775,6 +775,8 @@ void PlayScene::m_resetAll()
 
 void PlayScene::start()
 {
+	TheSoundManager::Instance()->playMusic("encounter", -1);
+	
 	// setup default heuristic
 	m_heuristic = MANHATTAN;
 	m_manhattanButtonColour = ImVec4(0.26f, 1.0f, 0.98f, 0.40f);
