@@ -23,6 +23,11 @@ void PlayScene::m_resetGrid()
 			tile->setTileState(UNDEFINED);
 			m_closedList.pop_back();
 		}
+		for (auto tile : shortest_path_)
+		{
+			tile->setTileState(UNDEFINED);
+			shortest_path_.pop_back();
+		}
 }
 
 void PlayScene::m_buildGrid()
@@ -40,6 +45,7 @@ void PlayScene::m_buildGrid()
 			auto tile = new Tile(glm::vec2(offset + size * col, offset + size * row), 
 				glm::vec2(col, row));
 			addChild(tile);
+			//tile->SetId(row*(800/40)+col);
 			tile->setTileState(UNDEFINED);
 			m_pGrid.push_back(tile);
 		}
@@ -92,13 +98,22 @@ int PlayScene::m_spawnObject(PathFindingDisplayObject* object)
 	return randomTileIndex;
 }
 
+void PlayScene::ResetShipPosition()
+{
+	if (m_pShip->getTile() != nullptr)
+	{
+		m_pShip->setPosition(m_pShip->getTile()->getPosition());
+	}
+}
+
 void PlayScene::m_spawnShip()
 {
+	ResetShipPosition();
 	if (m_pShip->getTile() != nullptr)
 	{
 		m_pShip->getTile()->setTileState(UNDEFINED);
 	}
-	
+
 	const auto randomTileIndex = m_spawnObject(m_pShip);
 	m_pGrid[randomTileIndex]->setTileState(START);
 	m_pShip->setState(IDLE);
@@ -106,11 +121,12 @@ void PlayScene::m_spawnShip()
 
 void PlayScene::m_spawnPlanet()
 {
+	ResetShipPosition();
 	if (m_pPlanet->getTile() != nullptr)
 	{
 		m_pPlanet->getTile()->setTileState(UNDEFINED);
 	}
-	
+
 	const auto randomTileIndex = m_spawnObject(m_pPlanet);
 	auto tile = m_pGrid[randomTileIndex];
 	m_computeTileValues();
@@ -119,13 +135,14 @@ void PlayScene::m_spawnPlanet()
 
 void PlayScene::PopulateGrid()
 {
+	m_resetGrid();
 	for (auto tile : impassable_list_)
 	{
 		tile->setTileState(UNDEFINED);
 		ComputeDistanceForOneTile(tile);
 		impassable_list_.pop_back();
 	}
-	m_findShortestPath();
+	//m_findShortestPath();
 	// RANDOMIZE TILE TEXTURE, SET TILE STATE IF TEXTURE IS OBSTACLE
 	for (auto tile : m_pGrid) {
 		if (tile->getTileState() != START && tile->getTileState() != GOAL) {
@@ -137,12 +154,12 @@ void PlayScene::PopulateGrid()
 					tile->setTileState(IMPASSABLE);
 					impassable_list_.push_back(tile);
 					ComputeDistanceForOneTile(tile);
-					if (!HasViablePath()) {
-						tile->SetTileType(DEFAULT_TILE);
-						tile->setTileState(original_state);
-						impassable_list_.pop_back();
-						ComputeDistanceForOneTile(tile);
-					}
+					//if (!HasViablePath()) {
+					//	tile->SetTileType(DEFAULT_TILE);
+					//	tile->setTileState(original_state);
+					//	impassable_list_.pop_back();
+					//	ComputeDistanceForOneTile(tile);
+					//}
 				}
 				else {
 					tile->setTileState(IMPASSABLE);
@@ -157,7 +174,7 @@ void PlayScene::PopulateGrid()
 void PlayScene::ComputeDistanceForOneTile(Tile* in_tile)
 {
 	if (in_tile->getTileState() == IMPASSABLE) {
-		in_tile->GetValueLabel()->setText("INF");
+		in_tile->SetTargetDistance(INFINITY);
 	}
 	else {
 		in_tile->setHeuristic(m_heuristic);
@@ -184,62 +201,173 @@ Tile* PlayScene::m_findLowestCostTile(const std::vector<Tile*>& neighbours)
 		// ensure the tile you are inspecting is not a nullptr
 		if (tile != nullptr)
 		{
-			// find the minimum value
-			if (min > tile->getTileValue())
-			{
-				min = tile->getTileValue();
-				minTile = tile;
+			if (tile->getTileState() == UNDEFINED || tile->getTileState() == GOAL) {
+				// find the minimum value
+				if (min > tile->getTileValue())
+				{
+					min = tile->getTileValue();
+					minTile = tile;
+				}
 			}
 		}
 	}
-
-	// now for every tile in the neighbours vector
-	for (auto tile : neighbours)
-	{
-		// check if the tile is not a nullptr and make sure it is only undefined
-		if ((tile != nullptr) && (tile->getTileState() == UNDEFINED))
-		{
-			// mark the minimum tile as open and add it to the open list
-			if (tile == minTile)
-			{
-				tile->setTileState(OPEN);
-				m_openList.push_back(tile);
-			}
-			// mark the other tiles as closed and add them to the closed list
-			else
-			{
-				tile->setTileState(CLOSED);
-				m_closedList.push_back(tile);
-			}
-		}
-	}
-
 	return minTile;
 }
 
 void PlayScene::m_findShortestPath()
 {
+	m_resetGrid();
 	//m_computeTileValues();
-
+	std::cout << "finding shortest... ..." << std::endl;
 	auto tile = m_pShip->getTile();
-
+	path_cost_ = 0;
 	while(tile->getTileState() != GOAL)
 	{
 		const auto neighbours = tile->getNeighbours();
 
 		tile = m_findLowestCostTile(neighbours);
+		//std::cout << tile->getGridPosition().x << " " << tile->getGridPosition().y << std::endl;
+		if (tile == nullptr) {
+			std::cout << "NO PATH" << std::endl;
+			path_cost_ = -1;
+			m_resetGrid();
+			break;
+		}
+		else {
+			shortest_path_.push_back(tile);
+			path_cost_ += tile->GetTileType();
+		}
+
+		// now for every tile in the neighbours vector
+		for (auto neighbor_tile : neighbours)
+		{
+			// check if the tile is not a nullptr and make sure it is only undefined
+			if (neighbor_tile != nullptr) 
+			{
+				if (neighbor_tile->getTileState() == UNDEFINED) {
+					neighbor_tile->setTileState(CLOSED);
+					m_closedList.push_back(neighbor_tile);
+				}
+			}
+		}
 	}
+
+	for (auto tile : m_closedList) {
+		tile->setTileState(UNDEFINED);
+	}
+
+	if (!shortest_path_.empty()) {
+		for (auto tile : shortest_path_) {
+			tile->setTileState(OPEN);
+		}
+	}
+}
+
+std::pair<Tile*, int> PlayScene::FindLowestCostTileFromList(std::vector<Tile*> in_list)
+{
+	std::pair<Tile*, int> result;
+	result.first = nullptr;
+	result.second = -1;
+	auto min = INFINITY;
+	int count = 0;
+	// for every tile in the neighbours vector
+	for (auto tile : in_list)
+	{
+		// ensure the tile you are inspecting is not a nullptr
+		if (tile != nullptr)
+		{
+			// find the minimum value
+			if (min > tile->getTileValue())
+			{
+				min = tile->getTileValue();
+				result.first = tile;
+				result.second = count;
+			}
+		}
+		count++;
+	}
+
+	return result;
+}
+
+bool PlayScene::IsIdInList(std::vector<Tile*> list, int id)
+{
+	for(auto tile : list){
+		if (id == tile->GetId()) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void PlayScene::FindShortestPathAStar()
+{
+	std::vector<Tile*> open_list;
+	std::vector<Tile*> closed_list;
+	shortest_path_.clear();
+	shortest_path_.resize(0);
+	shortest_path_.shrink_to_fit();
+	open_list.push_back(m_pShip->getTile());
+	while (!open_list.empty()) {
+		std::pair<Tile*, int> curr_node = FindLowestCostTileFromList(open_list);
+		if (curr_node.first->getTileState() == GOAL) {
+			std::cout << "LAST LINE" << std::endl;
+			auto curr = curr_node.first;
+			while (curr->getTileState() != START) {
+				std::cout << "ONE " << curr->getGridPosition().x << " " << curr->getGridPosition().y << std::endl;
+				shortest_path_.push_back(curr);
+				curr = curr->GetParentNode();
+				std::cout << "TWO " << curr->getGridPosition().x << " " << curr->getGridPosition().y << std::endl;
+			}
+			break;
+		}
+		closed_list.push_back(curr_node.first);
+		open_list.erase(open_list.begin() + curr_node.second);
+		for (auto neighbor : curr_node.first->getNeighbours()) {
+			if (neighbor != nullptr) {
+				if (!IsIdInList(open_list, neighbor->GetId())) {
+					neighbor->SetParentNode(curr_node.first);
+					open_list.push_back(neighbor);
+					//std::cout << "ONE " << curr_node.first->getGridPosition().x << " " << curr_node.first->getGridPosition().y << std::endl;
+				}
+				else if (curr_node.first->getTileValue() < neighbor->getTileValue()) {
+					neighbor->SetParentNode(curr_node.first);
+					//std::cout << "TWO " << curr_node.first->getGridPosition().x << " " << curr_node.first->getGridPosition().y << std::endl;
+				}
+			}
+		}
+	}
+	for (auto tile : shortest_path_) {
+		tile->setTileState(OPEN);
+	}
+}
+
+Tile* PlayScene::GetTileFromPosition(glm::vec2 position)
+{
+	//tile size: 40, fomula: int oneDindex = (row * length_of_row) + column; // Indexes
+	int column = int(position.x / 40);
+	int row = int(position.y / 40);
+	int row_length = int(800 / 40);
+	return m_pGrid[(row * row_length) + column];
+}
+
+void PlayScene::SetTileFromPosition(PathFindingDisplayObject* in_ptr)
+{
+	in_ptr->setTile(GetTileFromPosition(in_ptr->getPosition()));
 }
 
 void PlayScene::MoveStartToGoal()
 {
-	if (HasViablePath()) {
+	if (!shortest_path_.empty()) {
 		std::vector<glm::vec2> open_position_list;
-		for (auto node : m_openList) {
+		for (auto node : shortest_path_) {
 			open_position_list.push_back(node->getPosition());
 		}
 		open_position_list.push_back(m_pPlanet->getPosition());
 		m_pShip->SetTargetPath(open_position_list);
+		for (auto node : m_pShip->GetTargetPath()) {
+			std::cout << node.x << " " << node.y << std::endl;
+		}
 		m_pShip->setState(TRAVERSE);
 	}
 }
@@ -263,47 +391,61 @@ bool PlayScene::HasViablePath()
 	// RUN m_findShortestPath, ADD TILES TO shortest_path_, CLEAN shortest_path_ IF FALSE
 	m_findShortestPath();
 	
-	std::vector<Tile*> checked_tiles;
-	// START WITH SHIP TILE, THEN WORK OUT IF ADJACENT TILES HAVE AN OPEN TILE
-	auto test_tile = GetNeighborWithWantedState(m_pShip->getTile(), OPEN);
-	if (test_tile == nullptr) {
-		if (GetNeighborWithWantedState(test_tile, GOAL) != nullptr) {
-			return true;
-		}
-		else {
-			std::cout << "EARLY TERMINATION" << std::endl;
-			return false;
-		}
+	if (path_cost_ == -1) {
+		return false;
 	}
-	checked_tiles.push_back(test_tile);
-	test_tile->setTileState(CLOSED);
-	while (GetNeighborWithWantedState(test_tile, GOAL) == nullptr) {
-		Tile* next_tile = nullptr;
-		for (const auto neighbour_tile : test_tile->getNeighbours()) { //copied from GetNeighborWithWantedState()
-			if (neighbour_tile != nullptr) {
-				if (neighbour_tile->getTileState() == OPEN) {
-					checked_tiles.push_back(neighbour_tile);
-					next_tile = neighbour_tile;
-					test_tile = neighbour_tile;
-					//neighbour_tile->setTileState(CLOSED);
-					break;
-				}
-			}
-		}
-		checked_tiles.back()->setTileState(CLOSED);
-		if (next_tile == nullptr) {
-			SetStateForTileList(checked_tiles, OPEN);
-			return false;
-		}
+	else {
+		return true;
 	}
-	SetStateForTileList(checked_tiles, OPEN);
-	return true;
+
+	//std::vector<Tile*> checked_tiles;
+	//// START WITH SHIP TILE, THEN WORK OUT IF ADJACENT TILES HAVE AN OPEN TILE
+	//auto test_tile = GetNeighborWithWantedState(m_pShip->getTile(), OPEN);
+	//if (test_tile == nullptr) {
+	//	if (GetNeighborWithWantedState(test_tile, GOAL) != nullptr) {
+	//		return true;
+	//	}
+	//	else {
+	//		std::cout << "EARLY TERMINATION" << std::endl;
+	//		return false;
+	//	}
+	//}
+	//checked_tiles.push_back(test_tile);
+	//test_tile->setTileState(CLOSED);
+	//std::cout << "LINE 1" << std::endl;
+	//while (GetNeighborWithWantedState(test_tile, GOAL) == nullptr) {
+	//	std::cout << "LINE 2" << std::endl;
+	//	Tile* next_tile = nullptr;
+	//	for (const auto neighbour_tile : test_tile->getNeighbours()) { //copied from GetNeighborWithWantedState()
+	//		std::cout << "LINE 3" << std::endl;
+	//		if (neighbour_tile != nullptr) {
+	//			if (neighbour_tile->getTileState() == OPEN) {
+	//				std::cout << "LINE 4" << std::endl;
+	//				checked_tiles.push_back(neighbour_tile);
+	//				next_tile = neighbour_tile;
+	//				test_tile = neighbour_tile;
+	//				//neighbour_tile->setTileState(CLOSED);
+	//				break;
+	//			}
+	//		}
+	//	}
+	//	checked_tiles.back()->setTileState(CLOSED);
+	//	if (next_tile == nullptr) {
+	//		std::cout << "LINE 5" << std::endl;
+	//		SetStateForTileList(checked_tiles, OPEN);
+	//		return false;
+	//	}
+	//}
+	//SetStateForTileList(checked_tiles, OPEN);
+	//return true;
 }
 
 void PlayScene::SetStateForTileList(std::vector<Tile*> in_list, const TileState in_state)
 {
-	for (auto tile : in_list) {
-		tile->setTileState(in_state);
+	if (!in_list.empty()) {
+		for (auto tile : in_list) {
+			tile->setTileState(in_state);
+		}
 	}
 }
 
@@ -412,7 +554,7 @@ void PlayScene::m_ImGuiSetStyle()
 	style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
 }
 
-void PlayScene::m_updateUI()
+void PlayScene::UpdateSettingsUI()
 {
 	// Prepare Window Frame
 	ImGui::NewFrame();
@@ -456,46 +598,60 @@ void PlayScene::m_updateUI()
 	{
 		ImGui::Begin("About Pathfinding Simulator", &m_displayAbout, ImGuiWindowFlags_AlwaysAutoResize);
 		ImGui::Separator();
-		ImGui::Text("Authors:");
+		ImGui::Text("Template by:");
 		ImGui::Text("Tom Tsiliopoulos ");
+		ImGui::Text("Modified by:");
+		ImGui::Text("Trung Le (Kyle) & Shu Deng");
 		ImGui::End();
 	}
 
 	/*************************************************************************************************/
-	if (ImGui::Button("Respawn Ship"))
-	{
+	// HUD
+	std::string path_score_str = "Total Score: " + std::to_string(path_cost_ * 100);
+	if (path_cost_ == -1) {
+		path_score_str = "Total Score: NO PATH";
+	}
+	ImGui::Text(path_score_str.c_str());
+	std::string path_cost_str = "Total path cost: " + std::to_string(path_cost_);
+	ImGui::Text(path_cost_str.c_str());
+
+	// COMMANDS
+	if (ImGui::Button("Respawn Ship (Random)")){
+		m_spawnShip();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Respawn Ship (Preset 1)")) {
+		m_spawnShip();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Respawn Ship (Preset 2)")) {
+		m_spawnShip();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Respawn Ship (Preset 3)")) {
 		m_spawnShip();
 	}
 
-	ImGui::SameLine();
-
-	if (ImGui::Button("Respawn Planet"))
-	{
+	ImGui::NewLine();
+	if (ImGui::Button("Respawn Planet")){
 		m_spawnPlanet();
 	}
-
 	ImGui::SameLine();
-	
-	if (ImGui::Button("Respawn Obstacles"))
-	{
+	if (ImGui::Button("Respawn Obstacles")){
 		PopulateGrid();
 	}
 
-	ImGui::SameLine();
-
-	if (ImGui::Button("Find Shortest Path"))
-	{
+	ImGui::NewLine();
+	if (ImGui::Button("Find Shortest Path")){
+		//FindShortestPathAStar();
 		m_findShortestPath();
 	}
-	
 	ImGui::SameLine();
-
-	if (ImGui::Button("Move Ship"))
-	{
+	if (ImGui::Button("Move Ship")){
 		MoveStartToGoal();
 	}
 
-	if(ImGui::CollapsingHeader("Heuristic Options"))
+	if (ImGui::CollapsingHeader("Heuristic Options"))
 	{
 		ImGui::PushStyleColor(ImGuiCol_Button, m_manhattanButtonColour);
 		if (ImGui::Button("Manhattan Distance"))
@@ -513,10 +669,20 @@ void PlayScene::m_updateUI()
 		}
 		ImGui::PopStyleColor();
 	}
-	
 
 	// Main Window End
 	ImGui::End();
+}
+
+void PlayScene::UpdateHUD()
+{
+	
+}
+
+void PlayScene::m_updateUI()
+{
+	UpdateSettingsUI();
+	//UpdateHUD();
 }
 
 /*** SCENE FUNCTIONS ***/
@@ -538,20 +704,19 @@ void PlayScene::start()
 	// LOAD TEXTURES FOR TILES
 	LoadTileTextures();
 
-	// instantiate planet and add it to the DisplayList
-	m_pPlanet = new Planet();
-	addChild(m_pPlanet);
-
-	m_spawnPlanet();
-	
 	// instantiate ship and add it to the DisplayList
 	m_pShip = new Ship();
 	addChild(m_pShip);
 
 	m_spawnShip();
 
+	// instantiate planet and add it to the DisplayList
+	m_pPlanet = new Planet();
+	addChild(m_pPlanet);
 
-	PopulateGrid();
+	m_spawnPlanet();
+
+	//PopulateGrid();
 }
 
 PlayScene::PlayScene()
@@ -589,6 +754,9 @@ void PlayScene::update()
 {
 	//m_pTile->update();
 	m_pShip->update();
+	//if (m_pShip->getState() == TRAVERSE) {
+	//	SetTileFromPosition(m_pShip);
+	//}
 
 	if (m_displayUI)
 	{

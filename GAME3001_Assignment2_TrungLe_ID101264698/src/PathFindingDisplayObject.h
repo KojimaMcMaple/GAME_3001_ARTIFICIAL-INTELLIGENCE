@@ -15,10 +15,10 @@ public:
 	virtual void clean() override = 0;
 
 	// pathfinding behaviours
-	Tile* getTile() const;
+	Tile* getTile();
 	void setTile(Tile* new_tile);
 private:
-	Tile* m_currentTile;
+	Tile* m_currentTile = nullptr;
 };
 
 #endif /* defined (__PATH_FINDING_DISPLAY_OBJECT__)*/

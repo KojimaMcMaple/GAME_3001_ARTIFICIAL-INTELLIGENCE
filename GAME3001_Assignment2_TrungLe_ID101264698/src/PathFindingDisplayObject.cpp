@@ -7,7 +7,7 @@ PathFindingDisplayObject::PathFindingDisplayObject(): m_currentTile(nullptr)
 PathFindingDisplayObject::~PathFindingDisplayObject()
 = default;
 
-Tile* PathFindingDisplayObject::getTile() const
+Tile* PathFindingDisplayObject::getTile()
 {
 	return m_currentTile;
 }

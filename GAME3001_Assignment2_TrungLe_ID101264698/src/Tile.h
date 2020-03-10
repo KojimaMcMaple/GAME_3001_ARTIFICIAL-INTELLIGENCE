@@ -21,6 +21,9 @@ public:
 	Tile(glm::vec2 world_position = glm::vec2(), glm::vec2 grid_position = glm::vec2());
 	~Tile();
 
+	int GetId();
+	void SetId(int value);
+
 	// Inherited via GameObject
 	virtual void draw() override;
 	virtual void update() override;
@@ -45,6 +48,7 @@ public:
 	TileState getTileState() const;
 
 	void setTargetDistance(glm::vec2 goal_location);
+	void SetTargetDistance(float in_value);
 
 	glm::vec2 getGridPosition() const;
 
@@ -58,7 +62,11 @@ public:
 
 	Label* GetValueLabel();
 
+	Tile* GetParentNode();
+	void SetParentNode(Tile* in_tile);
+
 private:
+	int id_;
 	float m_cost = Config::TILE_COST;
 	float m_targetDist = 0.0f;
 	float m_tileValue = 0.0f;
@@ -73,6 +81,7 @@ private:
 	glm::vec2 m_goalLocation;
 	std::vector<Tile*> m_pNeighbours;
 	Heuristic m_heuristic;
+	Tile* parent_node_;
 };
 
 

@@ -43,6 +43,7 @@ private:
 	void LoadTileTextures();
 
 	int m_spawnObject(PathFindingDisplayObject* object);
+	void ResetShipPosition();
 	void m_spawnShip();
 	void m_spawnPlanet();
 
@@ -54,13 +55,19 @@ private:
 	// pathfinding functions & variables
 	Tile* m_findLowestCostTile(const std::vector<Tile*>& neighbours);
 	void m_findShortestPath();
+	std::pair<Tile*, int> FindLowestCostTileFromList(std::vector<Tile*> in_list);
+	bool IsIdInList(std::vector<Tile*> list, int id);
+	void FindShortestPathAStar();
+	Tile* GetTileFromPosition(glm::vec2 position);
+	void SetTileFromPosition(PathFindingDisplayObject* in_ptr);
 	void MoveStartToGoal();
 	Tile* GetNeighborWithWantedState(Tile* in_tile, const TileState in_state);
 	bool HasViablePath();
-	//std::vector<Tile*> shortest_path_;
+	std::vector<Tile*> shortest_path_;
 	std::vector<Tile*> m_openList;
 	std::vector<Tile*> m_closedList;
 	std::vector<Tile*> impassable_list_;
+	float path_cost_ = 0.0f;
 	void SetStateForTileList(std::vector<Tile*> in_list, const TileState in_state);
 	Heuristic m_heuristic;
 	void m_selectHeuristic(Heuristic heuristic);
@@ -70,6 +77,8 @@ private:
 	// ImGui utility functions
 	void m_ImGuiKeyMap();
 	void m_ImGuiSetStyle();
+	void UpdateSettingsUI();
+	void UpdateHUD();
 	void m_updateUI();
 
 	// ImGui menu variables

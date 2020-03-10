@@ -331,6 +331,7 @@ void Ship::CheckNextNode()
 			setTargetPosition(target_path_[curr_target_path_idx_]);
 		}
 		else {
+			curr_target_path_idx_ = -1;
 			m_arrive();
 		}
 	}

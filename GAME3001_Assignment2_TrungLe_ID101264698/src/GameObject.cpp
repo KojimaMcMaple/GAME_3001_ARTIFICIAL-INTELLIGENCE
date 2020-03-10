@@ -65,8 +65,6 @@ SteeringState GameObject::getState()
 
 void GameObject::setPosition(glm::vec2 newPosition)
 {
-
-
 	m_position = newPosition;
 }
 

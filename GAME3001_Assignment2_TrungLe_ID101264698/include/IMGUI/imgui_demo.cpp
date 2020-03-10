@@ -1739,9 +1739,9 @@ static void ShowDemoWindowLayout()
 
         // Demonstrate a few extra things
         // - Changing ImGuiCol_ChildBg (which is transparent black in default styles)
-        // - Using SetCursorPos() to position the child window (because the child window is an item from the POV of the parent window)
-        //   You can also call SetNextWindowPos() to position the child window. The parent window will effectively layout from this position.
-        // - Using ImGui::GetItemRectMin/Max() to query the "item" state (because the child window is an item from the POV of the parent window)
+        // - Using SetCursorPos() to position the child window (because the child window is an item from the POV of the parent_node_ window)
+        //   You can also call SetNextWindowPos() to position the child window. The parent_node_ window will effectively layout from this position.
+        // - Using ImGui::GetItemRectMin/Max() to query the "item" state (because the child window is an item from the POV of the parent_node_ window)
         //   See "Widgets" -> "Querying Status (Active/Focused/Hovered etc.)" section for more details about this.
         {
             ImGui::SetCursorPosX(50);
@@ -2479,7 +2479,7 @@ static void ShowDemoWindowPopups()
     {
         ImGui::TextWrapped("Below we are testing adding menu items to a regular window. It's rather unusual but should work!");
         ImGui::Separator();
-        // NB: As a quirk in this very specific example, we want to differentiate the parent of this menu from the parent of the various popup menus above.
+        // NB: As a quirk in this very specific example, we want to differentiate the parent_node_ of this menu from the parent_node_ of the various popup menus above.
         // To do so we are encloding the items in a PushID()/PopID() block to make them two different menusets. If we don't, opening any popup above and hovering our menu here
         // would open it. This is because once a menu is active, we allow to switch to a sibling menu by just hovering on it, which is the desired behavior for regular menus.
         ImGui::PushID("foo");

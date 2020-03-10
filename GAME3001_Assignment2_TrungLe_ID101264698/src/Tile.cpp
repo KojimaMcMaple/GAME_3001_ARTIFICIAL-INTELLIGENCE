@@ -40,6 +40,16 @@ Tile::~Tile()
 	m_pNeighbours.shrink_to_fit();
 }
 
+int Tile::GetId()
+{
+	return id_;
+}
+
+void Tile::SetId(int value)
+{
+	id_ = value;
+}
+
 void Tile::draw()
 {
 	const int xComponent = getPosition().x;
@@ -186,6 +196,21 @@ void Tile::setTargetDistance(const glm::vec2 goal_location)
 	m_pValueLabel->setText(labelstring);
 }
 
+void Tile::SetTargetDistance(float in_value)
+{
+	m_tileValue = in_value;
+	if (in_value == INFINITY) {
+		GetValueLabel()->setText("INF");
+	}
+	else {
+		std::ostringstream tempLabel;
+		tempLabel << std::fixed << std::setprecision(1) << m_tileValue;
+		const auto labelstring = tempLabel.str();
+		m_pValueLabel->setText(labelstring);
+	}
+	
+}
+
 glm::vec2 Tile::getGridPosition() const
 {
 	return m_gridPosition;
@@ -217,4 +242,14 @@ void Tile::setHeuristic(const Heuristic heuristic)
 Label* Tile::GetValueLabel()
 {
 	return m_pValueLabel;
+}
+
+Tile* Tile::GetParentNode()
+{
+	return parent_node_;
+}
+
+void Tile::SetParentNode(Tile* in_tile)
+{
+	parent_node_ = in_tile;
 }
